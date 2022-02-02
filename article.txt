@@ -1,0 +1,87 @@
+
+
+
+
+
+
+What are the Math and Stats Principles You Need for Data Science?
+Oct 21, 2020 | Data Science
+
+
+Coming into our Data Science program, you will need to know some math and stats. However, many of our applicants actually learn in the application process – you don’t need to be an expert before applying! Data science is a very accessible field to anyone dedicated to learning new skills, and we can work with any applicant to help them learn what they need to know. But what “skills” do we mean, exactly? Just what exactly are the data science math and stats principles you need to know?
+What are the main math principles you need to know to get into Codeup’s Data Science program?
+
+
+Algebra
+Do you know PEMDAS and can you solve for x? You will need to be or become comfortable with the following: 
+
+Variables (x, y, n, etc.)
+Formulas, functions, and variable manipulations (e.g. x^2 = x + 6, solve for x).
+Order of evaluation: PEMDAS: parentheses, exponents, then multiplication, division, addition, and subtraction
+Commutativity where a + b = b + a
+Associativity where a + (b + c) = (a + b) + c
+Adding and subtracting matrices
+A conceptual understanding of exponential growth/decay- things can increase at an increasing rate
+
+Descriptive Statistics
+Know what a min, max, mode, median, and average are. Have a conceptual understanding that stats/probability is about trying to quantify uncertainty.
+Data Visualization
+Know what a scatterplot is and how to read a barplot.
+How to Learn and Expand on These Concepts
+There are a number of great resources out there to teach you these and similar concepts. Khan Academy is a great starting place for data science math! If you want to know what exactly we assign our applicants, you’ll just have to apply!
+ 
+What about once you’re in Codeup?
+
+
+What You Won’t Do
+Do we do any mathematical proofs for concepts or perform derivations? No. 
+Do we do any calculus and probability calculating by hand? No.
+Are we transforming equations, where we cancel out units or terms and do lots of algebraic gymnastics? No
+What You Will Do
+Will we have Python solve our linear algebra problems for us? Yes
+Will we have Python calculate probabilities, the area under a curve, and the slope of a line for us? Yes
+Will we have Python do all of the calculus for us? Yes
+ 
+See, the data science math and stats slice of the pie is certainly doable. If you like problem-solving and are ready to challenge yourself, you’ll love data science! If you are interested in learning about data science, just apply! Our Admissions Manager can work with you to get you where you need to be starting from where you are now. Let us help you get there so you can launch a great new career.
+
+
+
+
+
+
+
+
+Our ProgramsFull Stack Web Development
+Data Science
+Systems Engineering
+
+
+
+
+
+Latest Blog Articles
+Codeup Start Dates for March 2022
+VET TEC Funding Now Available For Dallas Veterans
+Dallas Campus Re-opens With New Grant Partner
+Codeup Dallas Open House
+Codeup’s Placement Team Continues Setting Records
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
