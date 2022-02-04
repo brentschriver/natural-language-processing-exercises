@@ -7,6 +7,8 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import requests
 import nltk
+from nltk.corpus import stopwords
+from time import strftime
 
 
 # This function will create a dictionary of the wanted data.
@@ -35,7 +37,7 @@ def parse_blog(url):
     content = blog.find_all('div',class_ = 'entry-content')[0].text
       
     return {
-        'title': title, 'date & source': date_source, 'content': content
+        'title': title, 'date & source': date_source, 'original': content
     }
 
 # This function will loop through a list of urls and return a dataframe.
@@ -75,30 +77,44 @@ def get_article_text():
     return article.text
 
 
+'''========================================================================'''
+def parse_news_card(card):
+    'Given a news card object, returns a dictionary of the relevant information.'
+    card_title = card.select_one('.news-card-title')
+    output = {}
+    output['title'] = card.find('span', itemprop = 'headline').text
+    output['author'] = card.find('span', class_ = 'author').text
+    output['original'] = card.find('div', itemprop = 'articleBody').text
+    output['date'] = card.find('span', clas ='date').text
+    return output
 
-def get_inshorts():
-    urls = ['https://inshorts.com/en/read/science', 'https://inshorts.com/en/read/business','https://inshorts.com/en/read/sports','https://inshorts.com/en/read/technology','https://inshorts.com/en/read/entertainment']
-    # Create an empty list, articles, to hold the dictionaries for each article.
-    articles = []
-    for url in urls:
-        # Make request to 'https://inshorts.com/en/read/science'
-        response = requests.get(url)
-        # Use BeautifulSoup to store response content.
-        soup = BeautifulSoup(response.text)
-        cards = soup.find_all('div', class_='news-card')
-        # Loop through each news card on the page and get what we want
-        for card in cards:
-            title = card.find('span', itemprop='headline' ).text
-            author = card.find('span', class_='author').text
-            content = card.find('div', itemprop='articleBody').text
-            category = url[29:]
-            
-            # Create a dictionary, article, for each news card
-            article = {'title': title, 'category': category, 'author': author, 'content': content}
-            
-            # Add the dictionary, article, to our list of dictionaries, articles.
-            articles.append(article)
-    return pd.DataFrame(articles)
+
+def parse_inshorts_page(url):
+    '''Given a url, returns a dataframe where each row is a news article from the url.
+    Infers the category from the last section of the url.'''
+    category = url.split('/')[-1]
+    response = requests.get(url, headers={'user-agent': 'Codeup DS'})
+    soup = BeautifulSoup(response.text)
+    cards = soup.select('.news-card')
+    df = pd.DataFrame([parse_news_card(card) for card in cards])
+    df['category'] = category
+    return df
+
+def get_inshorts_articles():
+    '''
+    Returns a dataframe of news articles from the business, sports, technology, and entertainment sections of
+    inshorts.
+    '''
+    url = 'https://inshorts.com/en/read/'
+    categories = ['science', 'business', 'sports', 'technology', 'entertainment']
+    df = pd.DataFrame()
+    for cat in categories:
+        df = pd.concat([df, pd.DataFrame(parse_inshorts_page(url + cat))])
+    df = df.reset_index(drop=True)
+    # save the dataframe as json:
+    today = strftime('%Y-%m-%d')
+    df.to_json(f'inshorts-{today}.json')
+    return df
 
 
 '''========================================================================'''
@@ -129,25 +145,60 @@ def lemmatize(string):
     article_lemmatized = ' '.join(lemmas)
     return article_lemmatized
 
-def remove_stopwords(string):
+def remove_stopwords(string, extra_words =[], exclude_words =[]):
+    '''
+    This function takes in a string, optional extra_words and exclude_words parameters
+    with default empty lists and returns a string.
+    '''
+    # Create stopword_list.
     stopword_list = stopwords.words('english')
+    
+    # Remove 'exclude_words' from stopword_list to keep these in my text.
+    stopword_list = set(stopword_list) - set(exclude_words)
+    
+    # Add in 'extra_words' to stopword_list.
+    stopword_list = stopword_list.union(set(extra_words))
+
+    # Split words in string.
     words = string.split()
-    filtered_words = [w for w in words if w not in stopword_list]
-    print('Removed {} stopwords'.format(len(words) - len(filtered_words)))
-    print('---')
+    
+    # Create a list of words from my string with stopwords removed and assign to variable.
+    filtered_words = [word for word in words if word not in stopword_list]
+    
+    # Join words in the list back into strings and assign to a variable.
     string_without_stopwords = ' '.join(filtered_words)
+    
     return string_without_stopwords
 
+
 # This function will take in a dataframe of news/blog articles and if a column called 'content' exists, it will prepare the text in three different ways.
-def prep_text(df):
-    if 'content' in df.columns:
-        df.content = df.content.str.replace('\n',' ')
-        df.content = df.content.str.strip()
-        df['clean'] = df.content.apply(basic_clean)
-        df['stemmed'] = df.content.apply(stem)
-        df['lemmatized'] = df.content.apply(lemmatize)
-        return df
-    else:
-        print("Dataframe does not have required column 'content'.")
+def prep_text(df, column, extra_words=[], exclude_words=[]):
+    '''
+    This function take in a df and the string name for a text column with 
+    option to pass lists for extra_words and exclude_words and
+    returns a df with the text article title, original text, stemmed text,
+    lemmatized text, cleaned, tokenized, & lemmatized text with stopwords removed.
+    '''
+    df['clean'] = df[column].apply(basic_clean)\
+                            .apply(tokenize)\
+                            .apply(remove_stopwords, 
+                                   extra_words=extra_words, 
+                                   exclude_words=exclude_words)
+    
+    df['stemmed'] = df[column].apply(basic_clean)\
+                            .apply(tokenize)\
+                            .apply(stem)\
+                            .apply(remove_stopwords, 
+                                   extra_words=extra_words, 
+                                   exclude_words=exclude_words)
+    
+    df['lemmatized'] = df[column].apply(basic_clean)\
+                            .apply(tokenize)\
+                            .apply(lemmatize)\
+                            .apply(remove_stopwords, 
+                                   extra_words=extra_words, 
+                                   exclude_words=exclude_words)
+    
+    return df[['title', column,'clean', 'stemmed', 'lemmatized']]
         
 '''========================================================================'''
