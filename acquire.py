@@ -105,17 +105,21 @@ def get_inshorts_articles():
     Returns a dataframe of news articles from the business, sports, technology, and entertainment sections of
     inshorts.
     '''
-    url = 'https://inshorts.com/en/read/'
-    categories = ['science', 'business', 'sports', 'technology', 'entertainment']
-    df = pd.DataFrame()
-    for cat in categories:
-        df = pd.concat([df, pd.DataFrame(parse_inshorts_page(url + cat))])
-    df = df.reset_index(drop=True)
-    # save the dataframe as json:
     today = strftime('%Y-%m-%d')
-    df.to_json(f'inshorts-{today}.json')
-    return df
-
+    if os.path.isfile(f'inshorts-{today}.json'):
+        # If json file exists, read in data from json file.
+        df = pd.read_json(f'inshorts-{today}.json')
+        return df
+    else:
+        url = 'https://inshorts.com/en/read/'
+        categories = ['science', 'business', 'sports', 'technology', 'entertainment']
+        df = pd.DataFrame()
+        for cat in categories:
+            df = pd.concat([df, pd.DataFrame(parse_inshorts_page(url + cat))])
+        df = df.reset_index(drop=True)
+        # save the dataframe as json:
+        df.to_json(f'inshorts-{today}.json')
+        return df
 
 '''========================================================================'''
 def basic_clean(string):
