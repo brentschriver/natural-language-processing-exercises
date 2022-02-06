@@ -94,7 +94,7 @@ def parse_inshorts_page(url):
     Infers the category from the last section of the url.'''
     category = url.split('/')[-1]
     response = requests.get(url, headers={'user-agent': 'Codeup DS'})
-    soup = BeautifulSoup(response.text)
+    soup = BeautifulSoup(response.text, 'lxml')
     cards = soup.select('.news-card')
     df = pd.DataFrame([parse_news_card(card) for card in cards])
     df['category'] = category
@@ -175,7 +175,7 @@ def remove_stopwords(string, extra_words =[], exclude_words =[]):
     return string_without_stopwords
 
 
-# This function will take in a dataframe of news/blog articles and if a column called 'content' exists, it will prepare the text in three different ways.
+# This function will take in a dataframe of news/blog articles and prepare the text in three different ways.
 def prep_text(df, column, extra_words=[], exclude_words=[]):
     '''
     This function take in a df and the string name for a text column with 
